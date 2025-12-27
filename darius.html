@@ -485,7 +485,343 @@
         </button>
     </div>
 
-    <script src="bison.js"></script>
+    <script>
+        // Gestion des menus contextuels
+        document.addEventListener('DOMContentLoaded', function () {
+            const memberPhoto = document.getElementById('memberPhoto');
+            const photoMenu = document.getElementById('photoMenu');
+            const notificationsBtn = document.getElementById('toggleNotifications');
+            const cotisationsBtn = document.getElementById('toggleCotisations');
+            const notificationsMenu = document.getElementById('notificationsMenu');
+            const cotisationsMenu = document.getElementById('cotisationsMenu');
+            const overlay = document.getElementById('menuOverlay');
+            const closeButtons = document.querySelectorAll('.close-menu');
+
+            function openMenu(menu) {
+                menu.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeAllMenus() {
+                document.querySelectorAll('.context-menu').forEach(menu => {
+                    menu.classList.remove('active');
+                });
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // Ouvrir les menus
+            memberPhoto.addEventListener('click', () => openMenu(photoMenu));
+            notificationsBtn.addEventListener('click', () => openMenu(notificationsMenu));
+            cotisationsBtn.addEventListener('click', () => openMenu(cotisationsMenu));
+
+            // Fermer avec les boutons
+            closeButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const menuId = e.target.closest('.close-menu').dataset.menu;
+                    const menu = document.getElementById(menuId);
+                    if (menu) {
+                        menu.classList.remove('active');
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+
+            // Fermer avec l'overlay
+            overlay.addEventListener('click', closeAllMenus);
+
+            // Fermer avec la touche Échap
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAllMenus();
+                }
+            });
+
+            // Fonctionnalités pour les boutons de navigation
+            document.getElementById('scrollToTop').addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            document.getElementById('scrollToBottom').addEventListener('click', function () {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            });
+        });
+
+        // Fonction pour toggle les notifications
+        function toggleNotification(header) {
+            const notificationItem = header.parentElement;
+            notificationItem.classList.toggle('active');
+        }
+
+        // Fonction pour changer le statut de paiement (désactivée)
+        function togglePayment(dayItem) {
+            // Fonction désactivée - ne fait rien
+            return false;
+        }
+
+        // Fonction pour mettre à jour les statistiques de cotisation
+        function updateCotisationStats() {
+            const totalDays = document.querySelectorAll('.day-item').length;
+            const paidDays = document.querySelectorAll('.day-item.paid').length;
+            const percentage = Math.round((paidDays / totalDays) * 100);
+
+            // Tu peux utiliser ces valeurs si tu veux afficher des statistiques
+            console.log(`Jours payés: ${paidDays}/${totalDays} (${percentage}%)`);
+        }
+
+        // Initialiser les statistiques au chargement
+        window.addEventListener('DOMContentLoaded', function () {
+            updateCotisationStats();
+        });
+
+        // ============================================
+        // DONNÉES DES COTISATIONS - À MODIFIER ICI
+        // ============================================
+        const cotisationsData = [
+            {
+                mois: "Juin 2025",
+                jours: [
+                    { numero: "01", date: "01/06/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "08", date: "08/06/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "15", date: "15/06/2025", statut: "ignored", dernierDimanche: false },
+                    { numero: "22", date: "22/06/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "29", date: "29/06/2025", statut: "paid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Juillet 2025",
+                jours: [
+                    { numero: "06", date: "06/07/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "13", date: "13/07/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "20", date: "20/07/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "27", date: "27/07/2025", statut: "paid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Août 2025",
+                jours: [
+                    { numero: "03", date: "03/08/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "10", date: "10/08/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "17", date: "17/08/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "24", date: "24/08/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "31", date: "31/08/2025", statut: "paid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Septembre 2025",
+                jours: [
+                    { numero: "07", date: "07/09/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "14", date: "14/09/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "21", date: "21/09/2025", statut: "ignored", dernierDimanche: false },
+                    { numero: "28", date: "28/09/2025", statut: "paid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Octobre 2025",
+                jours: [
+                    { numero: "05", date: "05/10/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "12", date: "12/10/2025", statut: "paid", dernierDimanche: false },
+                    { numero: "19", date: "19/10/2025", statut: "unpaid", dernierDimanche: false },
+                    { numero: "26", date: "26/10/2025", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Novembre 2025",
+                jours: [
+                    { numero: "02", date: "02/11/2025", statut: "unpaid", dernierDimanche: false },
+                    { numero: "09", date: "09/11/2025", statut: "unpaid", dernierDimanche: false },
+                    { numero: "16", date: "16/11/2025", statut: "unpaid", dernierDimanche: false },
+                    { numero: "23", date: "23/11/2025", statut: "unpaid", dernierDimanche: false },
+                    { numero: "30", date: "30/11/2025", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Décembre 2025",
+                jours: [
+                    { numero: "07", date: "07/12/2025", statut: "unpaid", dernierDimanche: false },
+                    { numero: "14", date: "14/12/2025", statut: "unpaid", dernierDimanche: false },
+                    { numero: "21", date: "21/12/2025", statut: "unpaid", dernierDimanche: false },
+                    { numero: "28", date: "28/12/2025", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+
+            // ============================================
+            // DONNÉES DES COTISATIONS - ANNÉE 2026 COMPLÈTE
+            // ============================================
+
+            {
+                mois: "Janvier 2026",
+                jours: [
+                    { numero: "04", date: "04/01/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "11", date: "11/01/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "18", date: "18/01/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "25", date: "25/01/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Février 2026",
+                jours: [
+                    { numero: "01", date: "01/02/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "08", date: "08/02/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "15", date: "15/02/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "22", date: "22/02/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Mars 2026",
+                jours: [
+                    { numero: "01", date: "01/03/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "08", date: "08/03/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "15", date: "15/03/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "22", date: "22/03/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "29", date: "29/03/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Avril 2026",
+                jours: [
+                    { numero: "05", date: "05/04/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "12", date: "12/04/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "19", date: "19/04/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "26", date: "26/04/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Mai 2026",
+                jours: [
+                    { numero: "03", date: "03/05/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "10", date: "10/05/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "17", date: "17/05/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "24", date: "24/05/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "31", date: "31/05/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Juin 2026",
+                jours: [
+                    { numero: "07", date: "07/06/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "14", date: "14/06/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "21", date: "21/06/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "28", date: "28/06/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Juillet 2026",
+                jours: [
+                    { numero: "05", date: "05/07/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "12", date: "12/07/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "19", date: "19/07/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "26", date: "26/07/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Août 2026",
+                jours: [
+                    { numero: "02", date: "02/08/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "09", date: "09/08/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "16", date: "16/08/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "23", date: "23/08/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "30", date: "30/08/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Septembre 2026",
+                jours: [
+                    { numero: "06", date: "06/09/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "13", date: "13/09/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "20", date: "20/09/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "27", date: "27/09/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Octobre 2026",
+                jours: [
+                    { numero: "04", date: "04/10/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "11", date: "11/10/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "18", date: "18/10/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "25", date: "25/10/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Novembre 2026",
+                jours: [
+                    { numero: "01", date: "01/11/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "08", date: "08/11/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "15", date: "15/11/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "22", date: "22/11/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "29", date: "29/11/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            },
+            {
+                mois: "Décembre 2026",
+                jours: [
+                    { numero: "06", date: "06/12/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "13", date: "13/12/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "20", date: "20/12/2026", statut: "unpaid", dernierDimanche: false },
+                    { numero: "27", date: "27/12/2026", statut: "unpaid", dernierDimanche: true }
+                ]
+            }
+        ];
+
+        // ============================================
+        // FONCTION POUR GÉNÉRER LES COTISATIONS
+        // ============================================
+        function genererCotisations() {
+            const grid = document.getElementById('cotisationGrid');
+            if (!grid) return;
+
+            let html = '';
+
+            cotisationsData.forEach(moisData => {
+                html += `
+            <div class="month-section">
+                <h4 class="month-title">${moisData.mois}</h4>
+                <div class="days-grid">
+        `;
+
+                moisData.jours.forEach(jour => {
+                    const classes = ['day-item', jour.statut];
+                    if (jour.dernierDimanche) {
+                        classes.push('last-paid');
+                    }
+
+                    let icon = '';
+                    if (jour.statut === 'paid') {
+                        icon = jour.dernierDimanche ?
+                            '<i class="fas fa-flag-checkered"></i>' :
+                            '<i class="fas fa-check-circle"></i>';
+                    } else if (jour.statut === 'unpaid') {
+                        icon = '<i class="fas fa-times-circle"></i>';
+                    } else if (jour.statut === 'ignored') {
+                        icon = '<i class="fas fa-ban"></i>';
+                    }
+
+                    html += `
+                <div class="${classes.join(' ')}" data-date="${jour.date}">
+                    <span class="day-number">${jour.numero}</span>
+                    ${icon}
+                </div>
+            `;
+                });
+
+                html += `
+                </div>
+            </div>
+        `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        // Générer les cotisations au chargement de la page
+        window.addEventListener('DOMContentLoaded', function () {
+            genererCotisations();
+            updateCotisationStats();
+        });
+    </script>
 </body>
 
 </html>
+
